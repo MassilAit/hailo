@@ -9,7 +9,6 @@ hailo_sdk.core*.log
 
 # Generated artifacts (large binaries, reproducible)
 models/*/har/
-models/*/hef/
 
 # Python
 __pycache__/
