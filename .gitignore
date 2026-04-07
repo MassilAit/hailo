@@ -1,0 +1,16 @@
+# Hailo SDK logs (generated at runtime in cwd)
+acceleras.log
+allocator.log
+hailo_sdk.client.log
+hailo_sdk.core*.log
+
+# ONNX external data files
+*.onnx.data
+
+# Generated artifacts (large binaries, reproducible)
+models/*/har/
+models/*/hef/
+
+# Python
+__pycache__/
+*.pyc
