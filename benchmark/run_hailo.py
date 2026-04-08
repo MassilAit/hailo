@@ -14,7 +14,7 @@ import numpy as np
 
 try:
     from hailo_platform import (
-        HEF, VDevice, HailoStreamInterface,
+        HEF, VDevice, HailoStreamInterface, FormatType,
         InferVStreams, ConfigureParams, InputVStreamParams, OutputVStreamParams,
     )
 except ImportError:
@@ -35,25 +35,26 @@ def benchmark(hef_path, n_runs=200, warmup=20):
     ng             = network_groups[0]
     ng_params      = ng.create_params()
 
-    in_params  = InputVStreamParams.make(ng)
-    out_params = OutputVStreamParams.make(ng)
+    in_params  = InputVStreamParams.make(ng, format_type=FormatType.FLOAT32)
+    out_params = OutputVStreamParams.make(ng, format_type=FormatType.FLOAT32)
 
-    with InferVStreams(ng, in_params, out_params) as infer_pipeline:
-        input_info = hef.get_input_vstream_infos()[0]
-        shape      = [d for d in input_info.shape]   # e.g. [1, 64]
-        name       = input_info.name
+    with ng.activate(ng_params):
+        with InferVStreams(ng, in_params, out_params) as infer_pipeline:
+            input_info = hef.get_input_vstream_infos()[0]
+            shape      = [d for d in input_info.shape]
+            name       = input_info.name
 
-        dummy = {name: np.random.randn(*shape).astype(np.float32)}
+            dummy = {name: np.random.randn(*shape).astype(np.float32)}
 
-        # warmup
-        for _ in range(warmup):
-            infer_pipeline.infer(dummy)
+            # warmup
+            for _ in range(warmup):
+                infer_pipeline.infer(dummy)
 
-        # measure
-        t0 = time.perf_counter()
-        for _ in range(n_runs):
-            infer_pipeline.infer(dummy)
-        elapsed = time.perf_counter() - t0
+            # measure
+            t0 = time.perf_counter()
+            for _ in range(n_runs):
+                infer_pipeline.infer(dummy)
+            elapsed = time.perf_counter() - t0
 
     lat_ms = elapsed / n_runs * 1000
     tput   = n_runs / elapsed

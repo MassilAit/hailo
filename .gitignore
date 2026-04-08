@@ -9,6 +9,7 @@ hailo_sdk.core*.log
 
 # Generated artifacts (large binaries, reproducible)
 models/*/har/
+# models/*/hef/  # uncomment to exclude HEF binaries from git
 
 # Python
 __pycache__/
